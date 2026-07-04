@@ -47,7 +47,6 @@
       overflow:hidden;
     }
 
-    /* Logo circle with a number */
     .logo{
       position:absolute;
       left:20px;
@@ -190,7 +189,7 @@
 
       <div class="title">
         <h1 id="main-title">MadderZx Key</h1>
-        <p>Unique site key generator — copy or wait for auto-regenerate every 3 hours</p>
+        <p>Unique site key generator — copy. Key will auto-regenerate every 3 hours.</p>
       </div>
 
       <div class="card" aria-live="polite">
@@ -206,7 +205,6 @@
         <div style="display:flex; flex-direction:column; align-items:flex-end;">
           <div class="controls">
             <button id="copyBtn" title="Copy Key">Copy</button>
-            <button id="regenBtn" class="btn-ghost" title="Regenerate Now">Regenerate Now</button>
           </div>
         </div>
       </div>
@@ -227,7 +225,6 @@
       const genEl = document.getElementById('generatedAt');
       const countdownEl = document.getElementById('countdown');
       const copyBtn = document.getElementById('copyBtn');
-      const regenBtn = document.getElementById('regenBtn');
       const toast = document.getElementById('toast');
 
       function randStr(len=6){
@@ -238,7 +235,6 @@
       }
 
       function formatKey(){
-        // prefix + random part
         return 'madderZx-free-' + randStr(6);
       }
 
@@ -300,7 +296,6 @@
         const existing = localStorage.getItem(STORAGE_KEY);
         const ts = Number(localStorage.getItem(STORAGE_TS) || 0);
         if(!existing || !ts || (Date.now() - ts) >= EXPIRE_MS){
-          // create initial key (randomized)
           const initial = formatKey();
           localStorage.setItem(STORAGE_KEY, initial);
           localStorage.setItem(STORAGE_TS, String(Date.now()));
@@ -311,15 +306,15 @@
       // auto-check every second for countdown and expiration
       setInterval(updateCountdown, 1000);
 
-      // ensure auto-regenerate at exact expiry if tab open
+      // check every 10s for expiry and regenerate if needed (keeps tabs in sync)
       setInterval(()=>{
         const ts = Number(localStorage.getItem(STORAGE_TS) || 0);
         if(ts && (Date.now() - ts) >= EXPIRE_MS){
           regenerate();
         }
-      }, 10 * 1000); // check every 10s
+      }, 10 * 1000);
 
-      // Also set a strict timer to regenerate at expiry if tab stays
+      // strict schedule to regenerate exactly at expiry if tab remains open
       (function scheduleStrict(){
         const ts = Number(localStorage.getItem(STORAGE_TS) || 0);
         if(!ts) return;
@@ -331,7 +326,7 @@
           setTimeout(()=>{
             regenerate();
             scheduleStrict(); // schedule next
-          }, delay + 200); // small buffer
+          }, delay + 200);
         }
       })();
 
@@ -345,11 +340,6 @@
         }
       });
 
-      regenBtn.addEventListener('click', ()=>{
-        regenerate();
-        showToast('Regenerated');
-      });
-
       // Listen for storage events so multiple tabs stay in sync
       window.addEventListener('storage', (ev)=>{
         if(ev.key === STORAGE_KEY || ev.key === STORAGE_TS){
@@ -358,6 +348,4 @@
       });
 
     })();
-  </script>
-</body>
-</html># ModderZx-key
+ 
